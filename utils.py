@@ -3,7 +3,6 @@ import pandas as pd
 import numpy as np
 from os.path import join
 from tqdm import tqdm
-from ModelTexter import Texter
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import backend as K
@@ -69,9 +68,6 @@ def move_matching_files(dir_path, pattern, new_dir, overwrite):
     for elt in rglob(dir_path, pattern):
         shutil.move(elt, new_dir)
     
-def df_sample():
-    return pd.DataFrame([[1,2,3], [4,5,6], [7,8,9]], columns=['one', 'two', 'three'])
-
 def subset(a, b):
     a = np.array(a)
     b = np.array(b)
@@ -220,8 +216,6 @@ def checkpt_path(model_name, iteration, models_path=MODELS_PATH, best=True):
     else:
         return join(model_path, f'iter{iteration}_epoch{{epoch}}')
 
-
-
 def weighted_cross_entropy(weights):
     weights = K.variable(weights)
     def loss_f(y_true, y_pred):
@@ -231,17 +225,6 @@ def weighted_cross_entropy(weights):
         loss = -K.sum(loss, -1)
         return loss
     
-    return loss_f
-
-def weighted_cross_entropy_random(weights):
-    weights = K.variable(weights)
-    def loss_f(y_true, y_pred):
-        y_pred /= K.sum(y_pred, axis=-1, keepdims=True)
-        y_pred = K.clip(y_pred, K.epsilon(), 1 - K.epsilon())
-        ytr = tf.ones_like(y_pred) * (1/3)
-        loss = ytr * K.log(y_pred) * weights
-        loss = -K.sum(loss, -1)
-        return loss
     return loss_f
 
 def md_critic_loss(class_weights_ds, batch_size=BATCH_SIZE):
